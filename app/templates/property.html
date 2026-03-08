@@ -1,0 +1,233 @@
+{% extends "base.html" %}
+
+{% block css %}
+<style>
+body {
+    background: #f8f9fa;
+    padding-top: 60px;
+}
+
+.property-container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.property-detail-card {
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: row;
+    min-height: 500px;
+}
+
+.property-detail-img {
+    width: 50%;
+    height: auto;
+    object-fit: cover;
+}
+
+.property-detail-content {
+    width: 50%;
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+}
+
+.property-title {
+    font-size: 28px;
+    font-weight: 600;
+    margin-bottom: 20px;
+    color: #333;
+    line-height: 1.3;
+}
+
+.price-type-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 25px;
+    flex-wrap: wrap;
+}
+
+.price {
+    background-color: #6cb2fd;
+    color: white;
+    padding: 6px 16px;
+    border-radius: 24px;
+    font-size: 16px;
+    font-weight: 500;
+    display: inline-block;
+}
+
+.type {
+    background-color: #ffc107;
+    color: white;
+    padding: 6px 16px;
+    border-radius: 24px;
+    font-size: 16px;
+    font-weight: 500;
+    display: inline-block;
+}
+
+.property-description {
+    color: #333;
+    font-size: 15px;
+    line-height: 1.6;
+    margin-bottom: 5px;
+    flex-grow: 1;
+}
+
+.property-details-section {
+    margin-bottom: 25px;
+}
+
+.rooms-row {
+    display: flex;
+    gap: 30px;
+    margin-bottom: 15px;
+    font-size: 16px;
+    color: #333;
+}
+
+.rooms-row span {
+    display: flex;
+    align-items: center;
+}
+
+.rooms-row i {
+    margin-right: 8px;
+    font-size: 18px;
+}
+
+.rooms-row .bi-bed {
+    color: #8B4513;
+}
+
+.rooms-row .bi-shower {
+    color: #00BFFF;
+}
+
+.location {
+    display: flex;
+    align-items: center;
+    font-size: 16px;
+    color: #333;
+    margin-bottom: 25px;
+}
+
+.location i {
+    margin-right: 8px;
+    font-size: 18px;
+    color: #dc3545;
+}
+
+.email-btn {
+    background-color: #11b6a5;
+    color: white;
+    border: none;
+    padding: 14px;
+    font-size: 16px;
+    font-weight: 500;
+    border-radius: 4px;
+    cursor: pointer;
+    width: 40%;
+    transition: background-color 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: auto;
+}
+
+.email-btn:hover {
+    background-color: #11b6a5;
+}
+
+.email-btn i {
+    margin-right: 8px;
+}
+
+.back-link {
+    margin-bottom: 20px;
+    display: inline-block;
+    color: #666;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.back-link:hover {
+    color: #333;
+    text-decoration: underline;
+}
+
+.back-link i {
+    margin-right: 5px;
+    font-size: 12px;
+}
+
+@media (max-width: 768px) {
+    .property-detail-card {
+        flex-direction: column;
+    }
+    
+    .property-detail-img,
+    .property-detail-content {
+        width: 100%;
+    }
+    
+    .property-detail-img {
+        height: 300px;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="property-container">
+        <a href="{{ url_for('properties') }}" class="back-link">
+            <i class="bi bi-chevron-left"></i> Back to Properties
+        </a>
+        
+        <div class="property-detail-card">
+            <img class="property-detail-img" 
+                 src="{{ url_for('static', filename='uploads/' + property.photo) }}" 
+                 alt="{{ property.title }}">
+            
+            <div class="property-detail-content">
+                <h1 class="property-title">{{ property.title }}</h1>
+                
+                <div class="price-type-row">
+                    <span class="price">${{ property.price }}</span>
+                    <span class="type">{{ property.property_type }}</span>
+                </div>
+                
+                <div class="property-description">
+                    {{ property.description }}
+                </div>
+                
+                <div class="property-details-section">
+                    <div class="rooms-row">
+                        <span>
+                           <i class="bi bi-door-open-fill"></i> {{ property.bedrooms }} Bedrooms
+                        </span>
+                        <span>
+                           <i class="bi bi-droplet-fill"></i>{{ property.bathrooms }} Bathrooms
+                        </span>
+                    </div>
+                    
+                    <div class="location">
+                        <i class="bi bi-geo-alt-fill"></i> {{ property.location }}
+                    </div>
+                </div>
+                
+                <button class="email-btn">
+                    <i class="bi bi-envelope"></i>
+                    Email Realtor
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

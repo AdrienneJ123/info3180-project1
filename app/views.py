@@ -4,14 +4,23 @@ Jinja2 Documentation:    https://jinja.palletsprojects.com/
 Werkzeug Documentation:  https://werkzeug.palletsprojects.com/
 This file contains the routes for your application.
 """
-
+import os
 from app import app
-from flask import render_template, request, redirect, url_for
-
+from flask import render_template, redirect, url_for, flash, request
+from werkzeug.utils import secure_filename
+from app.forms import PropertyForm
+from app.models import Property
+from app import app, db
+import uuid
 
 ###
 # Routing for your application.
 ###
+ALLOWED_EXTENSIONS = {'jpg', 'jpeg', 'png'}
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
 
 @app.route('/')
 def home():
@@ -55,6 +64,65 @@ def add_header(response):
     response.headers['X-UA-Compatible'] = 'IE=Edge,chrome=1'
     response.headers['Cache-Control'] = 'public, max-age=0'
     return response
+
+
+@app.route('/properties/create', methods=['GET', 'POST'])
+def create_property():
+
+    form = PropertyForm()
+
+    if form.validate_on_submit():
+
+        try:
+            photo = form.photo.data
+
+            filename = str(uuid.uuid4()) + "_" + secure_filename(photo.filename)
+
+            filepath = os.path.join(
+                app.config['UPLOAD_FOLDER'],
+                filename
+            )
+
+            photo.save(filepath)
+
+            new_property = Property(
+                title=form.title.data,
+                description=form.description.data,
+                bedrooms=form.bedrooms.data,
+                bathrooms=form.bathrooms.data,
+                location=form.location.data,
+                price=form.price.data,
+                property_type=form.property_type.data,
+                photo=filename
+            )
+
+            db.session.add(new_property)
+            db.session.commit()
+            flash("Property successfully added!", "success")
+            return render_template('create_property.html', form=form, redirect=True)
+
+        except Exception:
+            db.session.rollback()
+            flash("Error saving property. Please try again.", "danger")
+
+    # Flash validation errors at the top
+    if form.errors:
+        for field, errors in form.errors.items():
+            for error in errors:
+                flash(error, "danger")
+
+    return render_template('create_property.html', form=form)
+
+
+@app.route('/properties') 
+def properties(): 
+    properties = Property.query.all() 
+    return render_template( 'properties.html', properties=properties )
+
+@app.route('/properties/<int:propertyid>') 
+def property(propertyid): 
+    property = Property.query.get_or_404(propertyid) 
+    return render_template( 'property.html', property=property )
 
 
 @app.errorhandler(404)
